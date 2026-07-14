@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: desafio
+  # Perfil ativo por padrao. Em producao, defina a variavel de ambiente
+  # SPRING_PROFILES_ACTIVE=prod (tem precedencia sobre este valor).
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jpa:
+    # Evita manter a sessao do EntityManager aberta durante o ciclo da requisicao web
+    open-in-view: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Actuator: expoe apenas health/info por padrao
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

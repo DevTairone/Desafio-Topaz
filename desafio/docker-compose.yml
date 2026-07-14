@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: desafio-postgres
+    restart: unless-stopped
+    environment:
+      # Mesmos nomes usados em application-prod.yml (DB_URL/DB_USERNAME/DB_PASSWORD).
+      POSTGRES_DB: ${DB_NAME:-desafio}
+      POSTGRES_USER: ${DB_USERNAME:-desafio}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-desafio}
+    ports:
+      - "5432:5432"
+    volumes:
+      - desafio-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-desafio} -d ${DB_NAME:-desafio}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  desafio-postgres-data:

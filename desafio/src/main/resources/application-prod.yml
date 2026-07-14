@@ -1,0 +1,22 @@
+# Perfil de producao: banco PostgreSQL, credenciais via variaveis de ambiente.
+spring:
+  datasource:
+    url: "${DB_URL:jdbc:postgresql://localhost:5432/desafio}"
+    username: "${DB_USERNAME:desafio}"
+    password: "${DB_PASSWORD:}"
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      # Simplificacao para este projeto: o Hibernate gerencia o schema.
+      # Em um ambiente real, prefira 'validate' + uma ferramenta de migracao
+      # (Flyway/Liquibase) versionando o schema em vez de deixar o Hibernate criar/alterar tabelas.
+      ddl-auto: update
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+
+logging:
+  level:
+    com.sys_top.desafio: INFO
