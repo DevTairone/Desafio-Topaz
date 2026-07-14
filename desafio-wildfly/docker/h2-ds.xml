@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Datasource de desenvolvimento (H2 em memória), no mesmo formato que o
+    ExampleDS que já vem com o WildFly. Basta copiar este arquivo para
+    standalone/deployments/ do WildFly 10 (deploy "implícito", sem precisar
+    editar standalone.xml nem reiniciar o servidor).
+-->
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.jboss.org/ironjacamar/schema http://www.jboss.org/ironjacamar/schema/datasources_1_2.xsd">
+    <datasource jndi-name="java:/DesafioDS" pool-name="DesafioDS" enabled="true" use-java-context="true">
+        <connection-url>jdbc:h2:mem:desafio;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+        <!-- "h2" é o mesmo módulo de driver já usado pelo ExampleDS padrão do WildFly. -->
+        <driver>h2</driver>
+        <security>
+            <user-name>sa</user-name>
+            <password>sa</password>
+        </security>
+    </datasource>
+</datasources>

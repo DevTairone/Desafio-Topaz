@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'com.sys-top'
+version = '0.0.1-SNAPSHOT'
+
+// WildFly 10 roda sobre Java EE 7 (Servlet 3.1) e foi certificado para Java 7/8.
+// O bytecode da aplicacao precisa ser compativel com Java 8 (sem var, records,
+// text blocks, Optional#orElseThrow() sem argumento, Stream#toList(), etc.).
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // APIs do Java EE 7 completo (JAX-RS, CDI, JPA, Servlet, JTA...) -- providas
+    // pelo proprio WildFly em tempo de execucao, por isso "providedCompile":
+    // nao entram no WAR final.
+    providedCompile 'javax:javaee-api:7.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+war {
+    archiveFileName = 'desafio-wildfly.war'
+}

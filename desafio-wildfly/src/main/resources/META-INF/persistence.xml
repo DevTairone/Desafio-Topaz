@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+             http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
+
+    <!--
+        Unidade de persistência gerenciada por JTA (o WildFly cuida da
+        transação, ver @Transactional nos beans CDI da camada application).
+
+        O JNDI "java:/DesafioDS" é o MESMO em dev e prod — o que muda entre
+        os dois ambientes é qual datasource o servidor tem registrado sob
+        esse nome (ver docker/h2-ds.xml e docker/postgres-ds.xml). Assim o
+        mesmo WAR roda sem alterações em ambos.
+    -->
+    <persistence-unit name="desafioPU" transaction-type="JTA">
+        <jta-data-source>java:/DesafioDS</jta-data-source>
+
+        <class>com.sys_top.desafio.domain.model.ShortUrl</class>
+        <class>com.sys_top.desafio.domain.model.UrlCounter</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <properties>
+            <!-- Simplificação assumida para este desafio: o Hibernate gerencia o
+                 schema (create/update). Em produção real, prefira 'validate' com
+                 o schema controlado por uma ferramenta de migração dedicada. -->
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="hibernate.show_sql" value="false" />
+        </properties>
+    </persistence-unit>
+</persistence>

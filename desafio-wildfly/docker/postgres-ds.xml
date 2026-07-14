@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Datasource de produção (PostgreSQL). Pré-requisito: o driver JDBC do
+    Postgres precisa estar deployado no WildFly antes deste arquivo — a
+    forma mais simples é copiar o jar do driver (ex.: postgresql-42.7.3.jar)
+    direto para standalone/deployments/, o que faz o WildFly reconhecê-lo
+    automaticamente como um driver JDBC (via META-INF/services). Depois,
+    copie este arquivo também para standalone/deployments/.
+
+    Ajuste <driver>, host/porta/banco e credenciais conforme o seu ambiente.
+-->
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.jboss.org/ironjacamar/schema http://www.jboss.org/ironjacamar/schema/datasources_1_2.xsd">
+    <datasource jndi-name="java:/DesafioDS" pool-name="DesafioDS" enabled="true" use-java-context="true">
+        <connection-url>jdbc:postgresql://localhost:5432/desafio</connection-url>
+        <!-- nome do driver = nome do arquivo jar deployado como driver -->
+        <driver>postgresql-42.7.3.jar</driver>
+        <security>
+            <user-name>desafio</user-name>
+            <password>desafio</password>
+        </security>
+    </datasource>
+</datasources>

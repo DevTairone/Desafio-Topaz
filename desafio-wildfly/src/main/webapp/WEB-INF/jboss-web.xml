@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-web>
+    <!--
+        Context-root "/" para o WAR ser servido direto na raiz do servidor
+        (ex.: http://host:8080/{codigo}), sem prefixo do nome do WAR — igual
+        ao comportamento da versao Spring Boot deste mesmo servico.
+    -->
+    <context-root>/</context-root>
+</jboss-web>

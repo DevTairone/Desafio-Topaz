@@ -1,0 +1,6 @@
+services:
+  wildfly:
+    build: .
+    container_name: desafio-wildfly
+    ports:
+      - "8080:8080"
