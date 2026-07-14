@@ -3,6 +3,7 @@ package com.sys_top.desafio.engine;
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.model.UrlStatus;
 import com.sys_top.desafio.domain.repository.ShortUrlRepository;
+import com.sys_top.desafio.service.UrlCounterService;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,8 +25,9 @@ import java.util.concurrent.TimeUnit;
  * - Execução estritamente sequencial (uma requisição por vez), mesmo que
  *   múltiplas threads HTTP chamem o método simultaneamente;
  * - Ordem de chegada (FIFO) no processamento;
- * - Ausência de condição de corrida na leitura/gravação do id que serve de
- *   base para o código curto, sem necessidade de locks explícitos no banco.
+ * - Ausência de condição de corrida na leitura/gravação do contador que
+ *   serve de base para o código curto (ver {@link UrlCounterService}, que
+ *   reforça a atomicidade também no nível do banco via lock pessimista).
  */
 @Slf4j
 @Component
@@ -34,6 +36,7 @@ public class UrlGenerationEngineImpl implements UrlGenerationEngine {
     private static final long SHUTDOWN_TIMEOUT_SECONDS = 10;
 
     private final ShortUrlRepository shortUrlRepository;
+    private final UrlCounterService urlCounterService;
 
     /** Único worker thread: é ele que serializa todo o processamento de geração. */
     private final ExecutorService executor = Executors.newSingleThreadExecutor(runnable -> {
@@ -42,8 +45,9 @@ public class UrlGenerationEngineImpl implements UrlGenerationEngine {
         return thread;
     });
 
-    public UrlGenerationEngineImpl(ShortUrlRepository shortUrlRepository) {
+    public UrlGenerationEngineImpl(ShortUrlRepository shortUrlRepository, UrlCounterService urlCounterService) {
         this.shortUrlRepository = shortUrlRepository;
+        this.urlCounterService = urlCounterService;
         log.info("Motor de geração de URLs iniciado (processamento serializado, thread única)");
     }
 
@@ -89,19 +93,18 @@ public class UrlGenerationEngineImpl implements UrlGenerationEngine {
             return existing.get();
         }
 
+        // o valor do contador (persistido de forma atômica) é a base da codificação
+        // base62 — independente do id técnico da linha em short_url
+        long sequence = urlCounterService.nextValue();
+        String code = Base62Encoder.encode(sequence);
+
         ShortUrl shortUrl = ShortUrl.builder()
+                .shortCode(code)
                 .originalUrl(originalUrl)
                 .status(UrlStatus.ACTIVE)
                 .accessCount(0L)
                 .build();
 
-        // 1ª gravação: obtém o id gerado pelo banco (base da codificação base62)
-        shortUrl = shortUrlRepository.save(shortUrl);
-
-        String code = Base62Encoder.encode(shortUrl.getId());
-        shortUrl.setShortCode(code);
-
-        // 2ª gravação: persiste o código curto calculado a partir do id
         shortUrl = shortUrlRepository.save(shortUrl);
 
         log.info("Código curto gerado: {} -> {}", code, originalUrl);

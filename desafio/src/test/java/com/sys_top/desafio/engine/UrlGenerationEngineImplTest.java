@@ -3,6 +3,7 @@ package com.sys_top.desafio.engine;
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.model.UrlStatus;
 import com.sys_top.desafio.domain.repository.ShortUrlRepository;
+import com.sys_top.desafio.service.UrlCounterService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,12 +27,14 @@ import static org.mockito.Mockito.when;
 class UrlGenerationEngineImplTest {
 
     private ShortUrlRepository repository;
+    private UrlCounterService urlCounterService;
     private UrlGenerationEngineImpl engine;
 
     @BeforeEach
     void setUp() {
         repository = mock(ShortUrlRepository.class);
-        engine = new UrlGenerationEngineImpl(repository);
+        urlCounterService = mock(UrlCounterService.class);
+        engine = new UrlGenerationEngineImpl(repository, urlCounterService);
     }
 
     @AfterEach
@@ -46,17 +49,14 @@ class UrlGenerationEngineImplTest {
         AtomicInteger picoDeExecucaoSimultanea = new AtomicInteger(0);
 
         when(repository.findByOriginalUrl(any())).thenReturn(Optional.empty());
+        when(urlCounterService.nextValue()).thenAnswer(invocation -> idSequence.incrementAndGet());
         when(repository.save(any())).thenAnswer(invocation -> {
             int atual = emExecucao.incrementAndGet();
             picoDeExecucaoSimultanea.updateAndGet(max -> Math.max(max, atual));
             try {
                 // simula trabalho de persistência, expondo eventual paralelismo indevido
                 Thread.sleep(20);
-                ShortUrl shortUrl = invocation.getArgument(0);
-                if (shortUrl.getId() == null) {
-                    shortUrl.setId(idSequence.incrementAndGet());
-                }
-                return shortUrl;
+                return invocation.getArgument(0);
             } finally {
                 emExecucao.decrementAndGet();
             }
