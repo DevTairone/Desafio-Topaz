@@ -1,9 +1,8 @@
-package com.sys_top.desafio.engine;
+package com.sys_top.desafio.application;
 
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.model.UrlStatus;
 import com.sys_top.desafio.domain.repository.ShortUrlRepository;
-import com.sys_top.desafio.service.UrlCounterService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

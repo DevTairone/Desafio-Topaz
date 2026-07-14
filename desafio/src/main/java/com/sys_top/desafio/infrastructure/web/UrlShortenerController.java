@@ -1,10 +1,10 @@
-package com.sys_top.desafio.web;
+package com.sys_top.desafio.infrastructure.web;
 
+import com.sys_top.desafio.application.UrlGenerationEngine;
+import com.sys_top.desafio.application.UrlValidator;
 import com.sys_top.desafio.domain.model.ShortUrl;
-import com.sys_top.desafio.engine.UrlGenerationEngine;
-import com.sys_top.desafio.service.UrlValidator;
-import com.sys_top.desafio.web.dto.ShortenUrlRequest;
-import com.sys_top.desafio.web.dto.ShortenUrlResponse;
+import com.sys_top.desafio.infrastructure.web.dto.ShortenUrlRequest;
+import com.sys_top.desafio.infrastructure.web.dto.ShortenUrlResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

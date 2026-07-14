@@ -1,10 +1,10 @@
-package com.sys_top.desafio.web;
+package com.sys_top.desafio.infrastructure.web;
 
-import com.sys_top.desafio.engine.UrlGenerationException;
-import com.sys_top.desafio.service.InvalidUrlException;
-import com.sys_top.desafio.service.ShortUrlExpiredException;
-import com.sys_top.desafio.service.ShortUrlNotFoundException;
-import com.sys_top.desafio.web.dto.ErrorResponse;
+import com.sys_top.desafio.domain.exception.InvalidUrlException;
+import com.sys_top.desafio.domain.exception.ShortUrlExpiredException;
+import com.sys_top.desafio.domain.exception.ShortUrlNotFoundException;
+import com.sys_top.desafio.domain.exception.UrlGenerationException;
+import com.sys_top.desafio.infrastructure.web.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

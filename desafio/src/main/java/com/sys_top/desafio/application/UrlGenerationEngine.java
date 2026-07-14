@@ -1,5 +1,6 @@
-package com.sys_top.desafio.engine;
+package com.sys_top.desafio.application;
 
+import com.sys_top.desafio.domain.exception.UrlGenerationException;
 import com.sys_top.desafio.domain.model.ShortUrl;
 
 /**

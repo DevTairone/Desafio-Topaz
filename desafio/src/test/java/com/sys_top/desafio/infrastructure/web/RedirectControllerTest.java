@@ -1,10 +1,10 @@
-package com.sys_top.desafio.web;
+package com.sys_top.desafio.infrastructure.web;
 
+import com.sys_top.desafio.application.UrlRedirectService;
+import com.sys_top.desafio.domain.exception.ShortUrlExpiredException;
+import com.sys_top.desafio.domain.exception.ShortUrlNotFoundException;
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.model.UrlStatus;
-import com.sys_top.desafio.service.ShortUrlExpiredException;
-import com.sys_top.desafio.service.ShortUrlNotFoundException;
-import com.sys_top.desafio.service.UrlRedirectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;

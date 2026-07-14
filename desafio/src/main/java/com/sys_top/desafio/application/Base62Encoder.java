@@ -1,4 +1,4 @@
-package com.sys_top.desafio.engine;
+package com.sys_top.desafio.application;
 
 /**
  * Utilitário de codificação/decodificação em base62 (0-9, A-Z, a-z).

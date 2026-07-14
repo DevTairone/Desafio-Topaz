@@ -1,4 +1,4 @@
-package com.sys_top.desafio.service;
+package com.sys_top.desafio.domain.exception;
 
 /**
  * Lançada quando a URL informada pelo usuário é inválida (vazia,

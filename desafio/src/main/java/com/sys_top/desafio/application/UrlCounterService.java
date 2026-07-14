@@ -1,8 +1,7 @@
-package com.sys_top.desafio.service;
+package com.sys_top.desafio.application;
 
 import com.sys_top.desafio.domain.model.UrlCounter;
 import com.sys_top.desafio.domain.repository.UrlCounterRepository;
-import com.sys_top.desafio.engine.UrlGenerationEngineImpl;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

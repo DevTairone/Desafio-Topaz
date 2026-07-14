@@ -1,5 +1,7 @@
-package com.sys_top.desafio.service;
+package com.sys_top.desafio.application;
 
+import com.sys_top.desafio.domain.exception.ShortUrlExpiredException;
+import com.sys_top.desafio.domain.exception.ShortUrlNotFoundException;
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.repository.ShortUrlRepository;
 import lombok.RequiredArgsConstructor;

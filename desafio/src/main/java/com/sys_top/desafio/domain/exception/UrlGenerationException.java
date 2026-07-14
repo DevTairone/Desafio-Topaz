@@ -1,4 +1,4 @@
-package com.sys_top.desafio.engine;
+package com.sys_top.desafio.domain.exception;
 
 /**
  * Erro ocorrido durante a geração de um código curto.

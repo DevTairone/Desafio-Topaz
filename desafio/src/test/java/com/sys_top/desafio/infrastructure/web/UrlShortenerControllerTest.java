@@ -1,8 +1,8 @@
-package com.sys_top.desafio.web;
+package com.sys_top.desafio.infrastructure.web;
 
+import com.sys_top.desafio.application.UrlGenerationEngine;
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.model.UrlStatus;
-import com.sys_top.desafio.engine.UrlGenerationEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;

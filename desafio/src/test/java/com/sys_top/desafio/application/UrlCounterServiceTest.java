@@ -1,8 +1,7 @@
-package com.sys_top.desafio.engine;
+package com.sys_top.desafio.application;
 
 import com.sys_top.desafio.domain.model.UrlCounter;
 import com.sys_top.desafio.domain.repository.UrlCounterRepository;
-import com.sys_top.desafio.service.UrlCounterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

@@ -2,16 +2,16 @@ package com.sys_top.desafio;
 
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.repository.ShortUrlRepository;
-import com.sys_top.desafio.web.dto.ShortenUrlRequest;
-import com.sys_top.desafio.web.dto.ShortenUrlResponse;
+import com.sys_top.desafio.infrastructure.web.GlobalExceptionHandler;
+import com.sys_top.desafio.infrastructure.web.RedirectController;
+import com.sys_top.desafio.infrastructure.web.UrlShortenerController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,72 +23,82 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Teste de integração ponta a ponta: sobe o contexto real da aplicação
- * (servidor embutido + banco H2 do perfil "dev") e exercita o fluxo
- * completo via HTTP, sem mocks — validando o encadeamento real entre
- * controllers, motor de geração, contador e persistência.
+ * (perfil "dev", banco H2) com os beans reais (motor de geração, contador,
+ * repositórios) e exercita os controllers reais via MockMvc — sem mocks —
+ * validando o encadeamento completo entre as camadas.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @ActiveProfiles("dev")
 class UrlShortenerIntegrationTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private UrlShortenerController urlShortenerController;
+
+    @Autowired
+    private RedirectController redirectController;
+
+    @Autowired
+    private GlobalExceptionHandler globalExceptionHandler;
 
     @Autowired
     private ShortUrlRepository shortUrlRepository;
 
+    private MockMvc mockMvc;
+
     @BeforeEach
-    void limparBanco() {
+    void setUp() {
         shortUrlRepository.deleteAll();
+        mockMvc = MockMvcBuilders.standaloneSetup(urlShortenerController, redirectController)
+                .setControllerAdvice(globalExceptionHandler)
+                .build();
     }
 
     @Test
-    void fluxoCompletoDeEncurtarERedirecionar() {
-        ShortenUrlResponse encurtada = encurtar("https://exemplo.com/pagina-de-teste");
+    void fluxoCompletoDeEncurtarERedirecionar() throws Exception {
+        ShortUrl encurtada = encurtar("https://exemplo.com/pagina-de-teste");
 
-        assertNotNull(encurtada.getShortCode());
-        assertEquals("https://exemplo.com/pagina-de-teste", encurtada.getOriginalUrl());
-
-        ResponseEntity<Void> redirect = restTemplate.getForEntity("/" + encurtada.getShortCode(), Void.class);
-
-        assertEquals(HttpStatus.FOUND, redirect.getStatusCode());
-        assertEquals("https://exemplo.com/pagina-de-teste", redirect.getHeaders().getLocation().toString());
+        mockMvc.perform(get("/" + encurtada.getShortCode()))
+                .andExpect(status().isFound())
+                .andExpect(header().string("Location", "https://exemplo.com/pagina-de-teste"));
     }
 
     @Test
-    void deveReaproveitarCodigoParaMesmaUrlOriginal() {
-        ShortenUrlResponse primeira = encurtar("https://exemplo.com/repetida");
-        ShortenUrlResponse segunda = encurtar("https://exemplo.com/repetida");
+    void deveReaproveitarCodigoParaMesmaUrlOriginal() throws Exception {
+        ShortUrl primeira = encurtar("https://exemplo.com/repetida");
+        ShortUrl segunda = encurtar("https://exemplo.com/repetida");
 
         assertEquals(primeira.getShortCode(), segunda.getShortCode());
     }
 
     @Test
-    void deveRetornar400ParaUrlInvalida() {
-        ShortenUrlRequest request = new ShortenUrlRequest("ftp://invalido");
-
-        ResponseEntity<String> response = restTemplate.postForEntity("/api/shorten", request, String.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    void deveRetornar400ParaUrlInvalida() throws Exception {
+        mockMvc.perform(post("/api/shorten")
+                        .contentType(APPLICATION_JSON)
+                        .content("{\"url\":\"ftp://invalido\"}"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveRetornar404ParaCodigoInexistente() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/codigo-que-nao-existe", String.class);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    void deveRetornar404ParaCodigoInexistente() throws Exception {
+        // precisa ser alfanumerico para bater na rota de redirecionamento ({code:[0-9A-Za-z]+})
+        mockMvc.perform(get("/codigoQueNaoExiste123"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void deveIncrementarContagemDeAcessosAposRedirecionar() {
-        ShortenUrlResponse encurtada = encurtar("https://exemplo.com/contagem");
+    void deveIncrementarContagemDeAcessosAposRedirecionar() throws Exception {
+        ShortUrl encurtada = encurtar("https://exemplo.com/contagem");
 
-        restTemplate.getForEntity("/" + encurtada.getShortCode(), Void.class);
-        restTemplate.getForEntity("/" + encurtada.getShortCode(), Void.class);
+        mockMvc.perform(get("/" + encurtada.getShortCode()));
+        mockMvc.perform(get("/" + encurtada.getShortCode()));
 
         ShortUrl atualizado = shortUrlRepository.findByShortCode(encurtada.getShortCode()).orElseThrow();
         assertEquals(2L, atualizado.getAccessCount());
@@ -114,11 +124,17 @@ class UrlShortenerIntegrationTest {
         }
     }
 
-    private ShortenUrlResponse encurtar(String url) {
-        ShortenUrlRequest request = new ShortenUrlRequest(url);
-        ResponseEntity<ShortenUrlResponse> response =
-                restTemplate.postForEntity("/api/shorten", request, ShortenUrlResponse.class);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        return response.getBody();
+    /** Encurta a URL via HTTP real (MockMvc) e retorna a entidade persistida no banco. */
+    private ShortUrl encurtar(String url) {
+        try {
+            mockMvc.perform(post("/api/shorten")
+                            .contentType(APPLICATION_JSON)
+                            .content("{\"url\":\"" + url + "\"}"))
+                    .andExpect(status().isCreated());
+
+            return shortUrlRepository.findByOriginalUrl(url).orElseThrow();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

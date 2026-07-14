@@ -1,9 +1,9 @@
-package com.sys_top.desafio.engine;
+package com.sys_top.desafio.application;
 
+import com.sys_top.desafio.domain.exception.UrlGenerationException;
 import com.sys_top.desafio.domain.model.ShortUrl;
 import com.sys_top.desafio.domain.model.UrlStatus;
 import com.sys_top.desafio.domain.repository.ShortUrlRepository;
-import com.sys_top.desafio.service.UrlCounterService;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

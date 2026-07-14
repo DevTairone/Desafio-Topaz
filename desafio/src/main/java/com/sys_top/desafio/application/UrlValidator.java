@@ -1,4 +1,6 @@
-package com.sys_top.desafio.service;
+package com.sys_top.desafio.application;
+
+import com.sys_top.desafio.domain.exception.InvalidUrlException;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -1,4 +1,4 @@
-package com.sys_top.desafio.service;
+package com.sys_top.desafio.domain.exception;
 
 /**
  * Lançada quando o código curto existe, porém a URL está expirada ou

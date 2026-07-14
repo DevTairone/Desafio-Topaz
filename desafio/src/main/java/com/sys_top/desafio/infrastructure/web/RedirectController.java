@@ -1,7 +1,7 @@
-package com.sys_top.desafio.web;
+package com.sys_top.desafio.infrastructure.web;
 
+import com.sys_top.desafio.application.UrlRedirectService;
 import com.sys_top.desafio.domain.model.ShortUrl;
-import com.sys_top.desafio.service.UrlRedirectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

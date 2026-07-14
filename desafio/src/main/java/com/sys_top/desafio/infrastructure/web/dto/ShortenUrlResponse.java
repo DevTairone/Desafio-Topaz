@@ -1,4 +1,4 @@
-package com.sys_top.desafio.web.dto;
+package com.sys_top.desafio.infrastructure.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
